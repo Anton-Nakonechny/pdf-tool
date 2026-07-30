@@ -1,0 +1,31 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Review with Claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Review this pull request for the agentic PDF tool (a single-file
+            client-side PDF workspace). Focus on:
+            - Bugs and correctness (especially around the bundled JSON encoding
+              on line 389 of PDF-workspace.html)
+            - Security issues
+            - Code quality and maintainability
+            Provide specific, actionable feedback as inline PR review comments.
